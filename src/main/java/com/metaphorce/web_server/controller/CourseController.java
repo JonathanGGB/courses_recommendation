@@ -2,7 +2,6 @@ package com.metaphorce.web_server.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,15 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.metaphorce.web_server.model.Course;
-import com.metaphorce.web_server.repository.CourseRepository;
+import com.metaphorce.dto.CourseDTO;
 import com.metaphorce.web_server.service.CourseService;
 
 @RestController
 @RequestMapping("/courses")
 public class CourseController {
-     @Autowired
-    private CourseRepository courseRepository;
 
     private final CourseService courseService;
 
@@ -30,43 +26,39 @@ public class CourseController {
         this.courseService = courseService;
     }
 
+    // GET all
     @GetMapping("/")
-    public ResponseEntity<List<Course>> getAllCourses() {
-        List<Course> courses = courseRepository.findAll();
-
-        return ResponseEntity.ok().body(courses);
+    public ResponseEntity<List<CourseDTO>> getAllCourses() {
+        List<CourseDTO> courses = courseService.getAllCourses();
+        return ResponseEntity.ok(courses);
     }
 
+    // GET by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Object> getCourseById(@PathVariable Long id) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
-
-        return ResponseEntity.ok().body(course);
+    public ResponseEntity<CourseDTO> getCourseById(@PathVariable Long id) {
+        CourseDTO course = courseService.getCourseById(id);
+        return ResponseEntity.ok(course);
     }
-    
+
+    // POST
     @PostMapping("/")
-    public ResponseEntity<Object> createCourse(@RequestBody Course course) {
-        Course createdCourse = courseService.createCourse(course);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body("Course created with id:" + createdCourse.getId());
+    public ResponseEntity<String> createCourse(@RequestBody CourseDTO courseDTO) {
+        CourseDTO created = courseService.createCourse(courseDTO);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Course created with id: " + created.getId());
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteCourse(@PathVariable Long id) {
-        courseRepository.deleteById(id);
-
-        return ResponseEntity.ok().body("Course deleted sucessfully with ID:" + id);
-    }
-
+    // PUT
     @PutMapping("/{id}")
-    public ResponseEntity<Object> updateCourse(@PathVariable Long id, @RequestBody Course courseDetails) {
-        Course course = courseRepository.findById(id).orElseThrow(() -> new RuntimeException("Course not found"));
+    public ResponseEntity<String> updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
+        CourseDTO updated = courseService.updateCourse(id, courseDTO);
+        return ResponseEntity.ok("Course updated successfully with ID: " + updated.getId());
+    }
 
-        course.setTitle(courseDetails.getTitle());
-        course.setTopic(courseDetails.getTopic());
-
-        Course updatedCourse = courseRepository.save(course);
-
-        return ResponseEntity.ok().body("Course updated sucessfully with ID:" + updatedCourse.getId());
+    // DELETE
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
+        courseService.deleteCourse(id);
+        return ResponseEntity.ok("Course deleted successfully with ID: " + id);
     }
 }
