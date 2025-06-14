@@ -16,12 +16,10 @@ services:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-prootpass"]
       interval: 10s
       timeout: 5s
-      retries: 5  
+      retries: 5
 
   web_server:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: jonathanggb/web_server:latest
     container_name: spring_app
     restart: unless-stopped
     ports:
