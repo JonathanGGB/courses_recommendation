@@ -16,7 +16,6 @@ import com.metaphorce.web_server.model.User;
 import com.metaphorce.web_server.repository.CourseRepository;
 import com.metaphorce.web_server.repository.UserRepository;
 
-
 @Service
 public class UserService {
 
@@ -30,8 +29,8 @@ public class UserService {
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
-            .map(this::convertToDTO)
-            .collect(Collectors.toList());
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 
     public UserDTO getUserById(Long id) {
@@ -86,7 +85,6 @@ public class UserService {
         return userDTO;
     }
 
-    // Convert DTO to Entity
     public User convertToEntity(UserDTO dto) {
         User user = new User();
 
@@ -98,9 +96,20 @@ public class UserService {
 
         if (dto.getCourses() != null) {
             Set<Course> courses = dto.getCourses().stream()
-                    .map(courseDTO -> courseRepository.findById(courseDTO.getId())
-                            .orElseThrow(() -> new RuntimeException("Course not found with id: " + courseDTO.getId())))
+                    .map(courseDTO -> {
+                        if (courseDTO.getId() != null) {
+                            return courseRepository.findById(courseDTO.getId())
+                                    .orElseThrow(() -> new RuntimeException(
+                                            "Course not found with id: " + courseDTO.getId()));
+                        } else {
+                            Course newCourse = new Course();
+                            newCourse.setTitle(courseDTO.getTitle());
+                            newCourse.setTopic(courseDTO.getTopic());
+                            return newCourse;
+                        }
+                    })
                     .collect(Collectors.toSet());
+
             user.setCourses(courses);
         }
 
@@ -109,7 +118,11 @@ public class UserService {
 
     public CourseDTO convertCourseToDTO(Course course) {
         CourseDTO courseDTO = new CourseDTO();
-        courseDTO.setId(course.getId());
+
+        if (course.getId() != null) {
+            courseDTO.setId(course.getId());
+        }
+
         courseDTO.setTitle(course.getTitle());
         courseDTO.setTopic(course.getTopic());
         return courseDTO;
@@ -118,9 +131,9 @@ public class UserService {
     @Transactional
     public UserDTO addCourseToUser(Long userId, Long courseId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Course course = courseRepository.findById(courseId)
-            .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new RuntimeException("Course not found"));
 
         user.getCourses().add(course);
         userRepository.save(user);
@@ -131,9 +144,9 @@ public class UserService {
     @Transactional
     public UserDTO removeCourseFromUser(Long userId, Long courseId) {
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("User not found"));
         Course course = courseRepository.findById(courseId)
-            .orElseThrow(() -> new RuntimeException("Course not found"));
+                .orElseThrow(() -> new RuntimeException("Course not found"));
 
         user.getCourses().remove(course);
         userRepository.save(user);
