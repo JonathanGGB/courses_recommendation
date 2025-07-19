@@ -35,7 +35,7 @@ public class CourseController {
 
     // GET by ID
     @GetMapping("/{id}")
-    public ResponseEntity<CourseDTO> getCourseById(@PathVariable Long id) {
+    public ResponseEntity<CourseDTO> getCourseById(@PathVariable String id) {
         CourseDTO course = courseService.getCourseById(id);
         return ResponseEntity.ok(course);
     }
@@ -50,14 +50,14 @@ public class CourseController {
 
     // PUT
     @PutMapping("/{id}")
-    public ResponseEntity<String> updateCourse(@PathVariable Long id, @RequestBody CourseDTO courseDTO) {
+    public ResponseEntity<String> updateCourse(@PathVariable String id, @RequestBody CourseDTO courseDTO) {
         CourseDTO updated = courseService.updateCourse(id, courseDTO);
         return ResponseEntity.ok("Course updated successfully with ID: " + updated.getId());
     }
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteCourse(@PathVariable Long id) {
+    public ResponseEntity<String> deleteCourse(@PathVariable String id) {
         courseService.deleteCourse(id);
         return ResponseEntity.ok("Course deleted successfully with ID: " + id);
     }

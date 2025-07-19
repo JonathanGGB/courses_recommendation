@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.metaphorce.dto.CourseDTO;
 import com.metaphorce.course_service.model.Course;
-import com.metaphorce.course_service.model.User;
 import com.metaphorce.course_service.repository.CourseRepository;
 
 @Service
@@ -23,7 +22,7 @@ public class CourseService {
         .toList();
     }
 
-    public CourseDTO getCourseById(Long id) {
+    public CourseDTO getCourseById(String id) {
         Course course = courseRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Course not found"));
         return convertToDTO(course);
@@ -35,7 +34,7 @@ public class CourseService {
         return convertToDTO(saved);
     }
 
-    public CourseDTO updateCourse(Long id, CourseDTO dto) {
+    public CourseDTO updateCourse(String id, CourseDTO dto) {
         Course course = courseRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Course not found"));
         course.setTitle(dto.getTitle());
@@ -44,16 +43,9 @@ public class CourseService {
         return convertToDTO(updated);
     }
 
-    public void deleteCourse(Long courseId) {
+    public void deleteCourse(String courseId) {
         Course course = courseRepository.findById(courseId)
             .orElseThrow(() -> new RuntimeException("Course not found"));
-
-        // Romper relaciones
-        for (User user : course.getUsers()) {
-            user.getCourses().remove(course);
-        }
-
-        course.getUsers().clear(); // opcional por seguridad
 
         courseRepository.delete(course);
     }
