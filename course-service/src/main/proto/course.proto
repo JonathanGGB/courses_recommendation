@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_outer_classname = "CourseServiceProto";
+
+package com.metaphorce.course_service.grpc;
+
+service CourseService {
+  rpc GetCourse (CourseRequest) returns (CourseResponse);
+}
+
+message CourseRequest {
+  string id = 1;
+}
+
+message CourseResponse {
+  string id = 1;
+  string name = 2;
+}
